@@ -3,7 +3,9 @@ package pipe.inventarios.controlador;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import pipe.inventarios.excepcion.RecursoNoEncontradoException;
 import pipe.inventarios.modelo.Producto;
 import pipe.inventarios.servicio.ProductoServicio;
 
@@ -32,5 +34,33 @@ public class ProductoControlador {
 
         return productoServicio.guardarProducto(producto);
     }
+
+    @GetMapping("/productos/{id}")
+    public ResponseEntity<Producto> obtenerProductoPorId(
+            @PathVariable int id
+    ){
+        Producto producto = this.productoServicio.buscarProductoPorId(id);
+        if (producto != null) {
+            return ResponseEntity.ok(producto);
+        } else {
+            throw new RecursoNoEncontradoException("Producto no encontrado con id " + id);
+        }
+
+    }
+
+    @PutMapping("/productos/{id}")
+    public ResponseEntity<Producto> actualizarProducto(
+            @PathVariable int id,
+            @RequestBody Producto productoRecibido
+    ){
+        Producto producto = this.productoServicio.buscarProductoPorId(id);
+        producto.setDescripcion(productoRecibido.getDescripcion());
+        producto.setPrecio(productoRecibido.getPrecio());
+        producto.setExistencia(productoRecibido.getExistencia());
+        //guardamos
+        this.productoServicio.guardarProducto(producto);
+        return ResponseEntity.ok(producto);
+    }
+
 
 }
