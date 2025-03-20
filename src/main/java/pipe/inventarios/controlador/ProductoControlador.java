@@ -9,7 +9,9 @@ import pipe.inventarios.excepcion.RecursoNoEncontradoException;
 import pipe.inventarios.modelo.Producto;
 import pipe.inventarios.servicio.ProductoServicio;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/inventario-app")
@@ -60,6 +62,19 @@ public class ProductoControlador {
         //guardamos
         this.productoServicio.guardarProducto(producto);
         return ResponseEntity.ok(producto);
+    }
+
+    @DeleteMapping("/productos/{id}")
+    public ResponseEntity<Map<String,Boolean>> eliminarProducto( @PathVariable int id){
+        Producto producto = this.productoServicio.buscarProductoPorId(id);
+        if(producto == null){
+            throw new RecursoNoEncontradoException("No se encontro el producto con id " + id);
+
+    }
+        this.productoServicio.eliminarProductoPorId(producto.getIdProducto());
+        Map<String,Boolean> respuesta = new HashMap<>();
+        respuesta.put("eliminado", Boolean.TRUE);
+        return ResponseEntity.ok(respuesta);
     }
 
 
